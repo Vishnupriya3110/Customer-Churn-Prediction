@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Churn Prediction</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <style>
+    .results-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  margin-top: 20px;
+  max-width: 600px; /* Smaller width */
+  width: 100%; 
+  margin-left: auto; /* Horizontally center */
+  margin-right: auto;
+  text-align: center; /* Center-align content inside *//* Responsive */
+}
+
+.results-container h4 {
+  font-size: 1.2rem;
+  color: #F5F5F5;
+  margin-bottom: 10px;
+}
+
+.results-container textarea {
+  width: 90%;
+  height: 30px; /* Smaller height */
+  background: rgba(0, 0, 0, 0.3);
+  color: #00ffcc;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  margin-bottom: 8px;
+  resize: none;
+  transition: transform 0.2s ease-in-out;
+}
+
+.results-container textarea:focus {
+  transform: scale(1.02);
+}
+
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #2B4D3A; /* Dark Green background */
+      color: #F5F5F5; /* Off-white text */
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden; /* Prevents horizontal scrolling */
+    }
+
+    .container {
+      margin: 50px auto;
+      max-width: 900px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      transform: translateY(20px);
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #F5F5F5;
+      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+      animation: slideInFromLeft 1.5s forwards;
+    }
+
+    @keyframes slideInFromLeft {
+      0% {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #F5F5F5;
+    }
+
+    textarea {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid #F5F5F5;
+      color: #F5F5F5;
+      font-size: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    textarea:focus {
+      transform: scale(1.03);
+      border-color: #A1A1A1;
+    }
+
+    .btn-primary {
+      background-color: #2E8B57; /* Forest Green */
+      border: none;
+      color: #F5F5F5;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-radius: 5px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(106, 106, 106, 0.4);
+      background-color: #3B7A45; /* Darker Forest Green on hover */
+    }
+
+    /* Glassmorphism effect for Results section */
+    .results-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      padding: 15px;
+      margin-top: 20px;
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+    }
+
+    .results-container textarea {
+      background: rgba(0, 0, 0, 0.3);
+      color: #00ffcc;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transform: scale(1.02);
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .results-container textarea:focus {
+      transform: scale(1.05);
+    }
+
+    .form-group {
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .form-group:nth-child(even) {
+      animation-delay: 0.3s;
+    }
+
+    .form-group:nth-child(odd) {
+      animation-delay: 0.5s;
+    }
+
+    .col-md-12.d-flex.justify-content-center button {
+      animation: pulseButton 2s infinite;
+    }
+
+    @keyframes pulseButton {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2 class="text-center">Churn Prediction Form</h2>
+    <p class="text-center">Fill out the form to predict customer churn using the provided details.</p>
+
+    <form action="http://localhost:5000/" method="POST">
+      <div class="row">
+        <div class="col-md-9">
+          <div class="form-group">
+            <label for="query1">Senior Citizen:</label>
+            <textarea class="form-control" id="query1" name="query1" rows="2" placeholder="0 or 1"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query2">Monthly Charges:</label>
+            <textarea class="form-control" id="query2" name="query2" rows="2" placeholder="Enter the amount in dollars"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query3">Total Charges:</label>
+            <textarea class="form-control" id="query3" name="query3" rows="2" placeholder="Enter total charges in dollars"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query4">Gender:</label>
+            <textarea class="form-control" id="query4" name="query4" rows="2" placeholder="Male or Female"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query5">Partner:</label>
+            <textarea class="form-control" id="query5" name="query5" rows="2" placeholder="Yes or No"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query6">Dependents:</label>
+            <textarea class="form-control" id="query6" name="query6" rows="2" placeholder="Yes or No"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query7">Phone Service:</label>
+            <textarea class="form-control" id="query7" name="query7" rows="2" placeholder="Yes or No"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query8">Multiple Lines:</label>
+            <textarea class="form-control" id="query8" name="query8" rows="2" placeholder="Yes or No"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query9">Internet Service:</label>
+            <textarea class="form-control" id="query9" name="query9" rows="2" placeholder="DSL, Fiber Optic, or None"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query10">Online Security:</label>
+            <textarea class="form-control" id="query10" name="query10" rows="2" placeholder="Yes or No"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query11">Online Backup:</label>
+            <textarea class="form-control" id="query11" name="query11" rows="2" placeholder="Yes or No"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query12">Device Protection:</label>
+            <textarea class="form-control" id="query12" name="query12" rows="2" placeholder="Yes or No"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query13">Tech Support:</label>
+            <textarea class="form-control" id="query13" name="query13" rows="2" placeholder="Yes or No"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query14">Streaming TV:</label>
+            <textarea class="form-control" id="query14" name="query14" rows="2" placeholder="Yes or No"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query15">Streaming Movies:</label>
+            <textarea class="form-control" id="query15" name="query15" rows="2" placeholder="Yes or No"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query16">Contract:</label>
+            <textarea class="form-control" id="query16" name="query16" rows="2" placeholder="Month-to-Month, One Year, or Two Year"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query17">Paperless Billing:</label>
+            <textarea class="form-control" id="query17" name="query17" rows="2" placeholder="Yes or No"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query18">Payment Method:</label>
+            <textarea class="form-control" id="query18" name="query18" rows="2" placeholder="Electronic Check, Mailed Check, Bank Transfer, or Credit Card"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="query19">Tenure:</label>
+            <textarea class="form-control" id="query19" name="query19" rows="2" placeholder="Enter the number of months"></textarea>
+          </div>
+        </div>
+          
+        </div>
+         
+        </div>
+        <!-- Submit Button -->
+        <div class="col-md-12 d-flex justify-content-center">
+          <button type="submit" class="btn btn-primary btn-sm mt-4">Submit</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Display Output Section with Glassmorphism Effect -->
+    <div class="results-container">
+        <h4 class="text-center">Results:</h4>
+        <textarea class="form-control mb-2" rows="1" readonly>{{output1}}</textarea>
+        <textarea class="form-control mb-2" rows="1" readonly>{{output2}}</textarea>
+      </div>
+      
+      
+  </div>
+</body>
+
+</html>
